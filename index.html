@@ -3,271 +3,468 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Image Resize Tool - JiggashaHelp</title>
-
+<title>Advanced Image Resize Tool - JiggashaHelp</title>
 <style>
-body{
-    margin:0;
-    padding:20px;
-    font-family:Arial,sans-serif;
-    background:#f5f5f5;
+:root {
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --radius: 16px;
 }
 
-.tool{
-    max-width:650px;
-    margin:30px auto;
-    background:white;
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 3px 15px rgba(0,0,0,.10);
-    text-align:center;
+* {
+    box-sizing: border-box;
 }
 
-h1{
-    font-size:28px;
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-main);
 }
 
-input[type="file"]{
-    width:100%;
-    margin:15px 0;
+.container {
+    width: 100%;
+    max-width: 680px;
+    margin: 20px auto;
 }
 
-input[type="number"]{
-    width:120px;
-    padding:10px;
-    margin:5px;
+.tool {
+    background: var(--card-bg);
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
-button,
-.download{
-    display:inline-block;
-    padding:12px 20px;
-    margin:15px 5px;
-    border:none;
-    border-radius:7px;
-    background:#222;
-    color:white;
-    cursor:pointer;
-    text-decoration:none;
+.header {
+    text-align: center;
+    margin-bottom: 30px;
 }
 
-canvas{
-    max-width:100%;
-    margin-top:20px;
-    border:1px solid #ddd;
+.logo-area {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #eef2ff;
+    padding: 8px 16px;
+    border-radius: 50px;
+    margin-bottom: 15px;
 }
 
-#controls{
-    display:none;
+.logo-area svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary);
+}
+
+.logo-area span {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.header h1 {
+    margin: 0 0 6px;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.header p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.upload-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 35px 20px;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+    border-color: var(--primary);
+    background: #f1f5f9;
+}
+
+.upload-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.upload-box strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: var(--text-main);
+}
+
+.upload-box span {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+#imageInput {
+    display: none;
+}
+
+#controls {
+    display: none;
+    margin-top: 25px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-container {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+}
+
+.preview-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+}
+
+#file-info {
+    font-size: 12px;
+    background: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 6px;
+    color: var(--text-main);
+}
+
+#preview {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.preset-btn {
+    flex: 1;
+    padding: 6px 10px;
+    background: #f1f5f9;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: 0.2s;
+}
+
+.preset-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.dimensions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+}
+
+.field input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.ratio-box {
+    margin-top: 15px;
+    padding: 12px 15px;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.ratio-box label {
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+button, .download {
+    flex: 1;
+    padding: 13px 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.resize-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.resize-btn:hover {
+    background: var(--primary-hover);
+}
+
+.download {
+    display: none;
+    background: #10b981;
+    color: white;
+}
+
+.download:hover {
+    background: #059669;
+}
+
+#result {
+    display: none;
+    margin-top: 25px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+
+.result-title {
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+#canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+@media(max-width: 500px) {
+    body { padding: 10px; }
+    .tool { padding: 20px 15px; }
+    .dimensions { grid-template-columns: 1fr; }
+    .actions { flex-direction: column; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="tool">
+<div class="container">
+    <div class="tool">
+        
+        <!-- Header & Logo Section -->
+        <div class="header">
+            <div class="logo-area">
+                <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                <span>JiggashaHelp</span>
+            </div>
+            <h1>Image Resize Tool</h1>
+            <p>খুব সহজেই ছবির Width ও Height রিসাইজ করুন সেকেন্ডে</p>
+        </div>
 
-<h1>🖼️ Image Resize Tool</h1>
+        <!-- Upload Box -->
+        <label class="upload-box" for="imageInput">
+            <div class="upload-icon">📁</div>
+            <strong>ছবি এখানে ড্রপ করুন বা সিলেক্ট করুন</strong>
+            <span>JPG, PNG, WebP সমর্থিত</span>
+        </label>
+        <input type="file" id="imageInput" accept="image/*">
 
-<p>ছবির Width ও Height পরিবর্তন করুন</p>
+        <!-- Controls Section -->
+        <div id="controls">
+            <div class="preview-container">
+                <div class="preview-title">
+                    <span>📌 প্রিভিউ</span>
+                    <span id="file-info">0 x 0 px</span>
+                </div>
+                <img id="preview" alt="Preview">
+            </div>
 
-<input type="file" id="imageInput" accept="image/*">
+            <!-- Quick Size Presets -->
+            <div class="presets">
+                <button class="preset-btn" onclick="applyPreset(1)">100%</button>
+                <button class="preset-btn" onclick="applyPreset(0.75)">75%</button>
+                <button class="preset-btn" onclick="applyPreset(0.5)">50%</button>
+                <button class="preset-btn" onclick="applyPreset(0.25)">25%</button>
+            </div>
 
-<div id="controls">
+            <div class="dimensions">
+                <div class="field">
+                    <label>Width (px)</label>
+                    <input type="number" id="width" min="1">
+                </div>
+                <div class="field">
+                    <label>Height (px)</label>
+                    <input type="number" id="height" min="1">
+                </div>
+            </div>
 
-<p>
-Width:
-<input type="number" id="width">
+            <div class="ratio-box">
+                <label>
+                    <input type="checkbox" id="ratio" checked>
+                    🔒 Aspect Ratio (আুপাত অনুপাত) বজায় রাখুন
+                </label>
+            </div>
 
-Height:
-<input type="number" id="height">
-</p>
+            <div class="actions">
+                <button class="resize-btn" onclick="resizeImage()">Resize Image</button>
+                <a id="download" class="download">Download Image</a>
+            </div>
+        </div>
 
-<label>
-<input type="checkbox" id="ratio" checked>
-Aspect Ratio বজায় রাখুন
-</label>
+        <!-- Result Section -->
+        <div id="result">
+            <div class="result-title">✅ রিসাইজ করা ছবি</div>
+            <canvas id="canvas"></canvas>
+        </div>
 
-<br>
-
-<button onclick="resizeImage()">
-Resize Image
-</button>
-
-</div>
-
-<canvas id="canvas" style="display:none;"></canvas>
-
-<br>
-
-<a id="download"
-class="download"
-style="display:none;">
-Download Image
-</a>
-
+    </div>
 </div>
 
 <script>
-
 let image = new Image();
-
 let originalWidth = 0;
 let originalHeight = 0;
 
-const imageInput =
-document.getElementById("imageInput");
+const imageInput = document.getElementById("imageInput");
+const widthInput = document.getElementById("width");
+const heightInput = document.getElementById("height");
+const ratio = document.getElementById("ratio");
+const controls = document.getElementById("controls");
+const preview = document.getElementById("preview");
+const canvas = document.getElementById("canvas");
+const download = document.getElementById("download");
+const result = document.getElementById("result");
+const fileInfo = document.getElementById("file-info");
 
-const widthInput =
-document.getElementById("width");
-
-const heightInput =
-document.getElementById("height");
-
-const ratio =
-document.getElementById("ratio");
-
-const controls =
-document.getElementById("controls");
-
-const canvas =
-document.getElementById("canvas");
-
-const download =
-document.getElementById("download");
-
-
-imageInput.addEventListener("change", function(){
-
+imageInput.addEventListener("change", function() {
     const file = this.files[0];
-
     if(!file) return;
 
     const reader = new FileReader();
-
-    reader.onload = function(e){
-
-        image.onload = function(){
-
+    reader.onload = function(e) {
+        image.onload = function() {
             originalWidth = image.width;
             originalHeight = image.height;
 
-            widthInput.value =
-            originalWidth;
+            widthInput.value = originalWidth;
+            heightInput.value = originalHeight;
+            fileInfo.innerText = `${originalWidth} × ${originalHeight} px`;
 
-            heightInput.value =
-            originalHeight;
-
-            controls.style.display =
-            "block";
-
+            preview.src = e.target.result;
+            controls.style.display = "block";
+            result.style.display = "none";
+            download.style.display = "none";
         };
-
         image.src = e.target.result;
-
     };
-
     reader.readAsDataURL(file);
-
 });
 
-
-widthInput.addEventListener("input", function(){
-
-    if(!ratio.checked) return;
-
-    if(!originalWidth) return;
-
-    const newWidth =
-    parseInt(this.value);
-
-    if(newWidth > 0){
-
-        heightInput.value =
-        Math.round(
-            newWidth *
-            originalHeight /
-            originalWidth
-        );
-
+widthInput.addEventListener("input", function() {
+    if(!ratio.checked || !originalWidth) return;
+    const newWidth = parseInt(this.value);
+    if(newWidth > 0) {
+        heightInput.value = Math.round(newWidth * originalHeight / originalWidth);
     }
-
 });
 
-
-heightInput.addEventListener("input", function(){
-
-    if(!ratio.checked) return;
-
-    if(!originalHeight) return;
-
-    const newHeight =
-    parseInt(this.value);
-
-    if(newHeight > 0){
-
-        widthInput.value =
-        Math.round(
-            newHeight *
-            originalWidth /
-            originalHeight
-        );
-
+heightInput.addEventListener("input", function() {
+    if(!ratio.checked || !originalHeight) return;
+    const newHeight = parseInt(this.value);
+    if(newHeight > 0) {
+        widthInput.value = Math.round(newHeight * originalWidth / originalHeight);
     }
-
 });
 
+// Quick Preset Function
+function applyPreset(scale) {
+    if(!originalWidth || !originalHeight) return;
+    widthInput.value = Math.round(originalWidth * scale);
+    heightInput.value = Math.round(originalHeight * scale);
+}
 
-function resizeImage(){
+function resizeImage() {
+    const width = parseInt(widthInput.value);
+    const height = parseInt(heightInput.value);
 
-    const width =
-    parseInt(widthInput.value);
-
-    const height =
-    parseInt(heightInput.value);
-
-    if(!width || !height){
-
-        alert("Width এবং Height দিন।");
-
+    if(!width || !height) {
+        alert("দয়া করে সঠিক Width এবং Height দিন।");
         return;
     }
 
     canvas.width = width;
     canvas.height = height;
 
-    const ctx =
-    canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
 
-    ctx.drawImage(
-        image,
-        0,
-        0,
-        width,
-        height
-    );
+    result.style.display = "block";
 
-    canvas.style.display =
-    "block";
-
-    canvas.toBlob(function(blob){
-
-        const url =
-        URL.createObjectURL(blob);
-
+    canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
         download.href = url;
-
-        download.download =
-        "jiggashahelp-resized-image.jpg";
-
-        download.style.display =
-        "inline-block";
-
-    },"image/jpeg",0.90);
-
+        download.download = "jiggashahelp-resized-image.jpg";
+        download.style.display = "block";
+    }, "image/jpeg", 0.92);
 }
-
 </script>
 
 </body>

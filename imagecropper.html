@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="JiggashaHelp free online Image Cropper. Crop, rotate and download images directly in your browser.">
+<title>Image Cropper Pro - JiggashaHelp</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255,255,255,0.5) inset;
+  --success: #10b981;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  color: var(--text-dark);
+  background-color: #f1f5f9;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated Background Orbs */
+.bg-shapes { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+.shape { position: absolute; filter: blur(90px); border-radius: 50%; animation: float 20s infinite ease-in-out alternate; }
+.shape-1 { width: 500px; height: 500px; background: rgba(79, 70, 229, 0.15); top: -100px; left: -100px; }
+.shape-2 { width: 600px; height: 600px; background: rgba(16, 185, 129, 0.12); bottom: -150px; right: -100px; animation-delay: -5s; }
+.shape-3 { width: 400px; height: 400px; background: rgba(236, 72, 153, 0.1); top: 40%; left: 40%; animation-duration: 25s; }
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 50px) scale(1.1); }
+}
+
+button, input { font: inherit; }
+button { border: 0; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+.hidden { display: none !important; }
+
+/* Navbar */
+.nav {
+  height: 66px; position: sticky; top: 0; z-index: 30;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255,255,255,0.6);
+}
+.navin { max-width: 1200px; margin: auto; height: 100%; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--text-dark); }
+.logo-icon { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), #818cf8); display: grid; place-items: center; color: #fff; box-shadow: 0 8px 16px rgba(79, 70, 229, 0.25); }
+.badge { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border); color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+
+/* Hero */
+.wrap { max-width: 1200px; margin: auto; padding: 24px 24px 50px; }
+.hero { text-align: center; max-width: 760px; margin: 0 auto 24px; animation: slideUp 0.6s ease-out; }
+.hero h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; line-height: 1.1; letter-spacing: -1px; margin-bottom: 10px; background: linear-gradient(135deg, #0f172a 20%, #4f46e5 80%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+
+/* Workspace Container */
+.workspace {
+  display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px;
+  animation: slideUp 0.8s ease-out backwards; animation-delay: 0.1s;
+}
+
+/* Glass Panels */
+.panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; box-shadow: var(--glass-shadow); min-width: 0; }
+.head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.sub { font-size: 11px; font-weight: 700; color: var(--primary); background: rgba(79, 70, 229, 0.1); padding: 4px 10px; border-radius: 8px; }
+
+/* Upload Area */
+.upload {
+  min-height: 380px; border: 2px dashed rgba(148, 163, 184, 0.4); border-radius: 16px;
+  display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px;
+  background: rgba(255, 255, 255, 0.4); transition: all 0.3s ease; cursor: pointer;
+}
+.upload:hover, .upload.drag { border-color: var(--primary); background: rgba(79, 70, 229, 0.04); transform: scale(0.99); }
+.upicon { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 18px; background: #fff; display: grid; place-items: center; color: var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+.upload h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.upload p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+.btn-primary, .btn-crop { background: linear-gradient(135deg, var(--primary), #6366f1); color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; transition: all 0.3s; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.25); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-primary:hover, .btn-crop:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(79, 70, 229, 0.35); }
+.hint { margin-top: 14px; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+
+/* Canvas Box */
+.canvasBox {
+  min-height: 380px; position: relative; display: flex; align-items: center; justify-content: center;
+  border-radius: 16px; overflow: hidden; background: #0f172a; border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15) inset;
+}
+#canvasView { display: block; max-width: 100%; max-height: 380px; touch-action: none; cursor: crosshair; }
+.chiprow { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; pointer-events: none; z-index: 5; }
+.chip { padding: 6px 12px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 999px; font-size: 10px; font-weight: 800; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+
+/* Right Panel Cards */
+.card { padding: 14px 16px; background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.8); border-radius: 14px; margin-bottom: 16px; }
+.cardTitle { font-size: 12px; font-weight: 800; margin-bottom: 12px; color: var(--text-dark); }
+.fileGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.item { padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); }
+.item small { display: block; color: var(--text-muted); font-size: 9px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.item strong { display: block; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Ratios & Tools */
+.ratios { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ratioBtn { padding: 10px 0; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--text-muted); transition: all 0.2s; }
+.ratioBtn:hover { background: #fff; }
+.ratioBtn.active { background: #fff; border-color: var(--primary); color: var(--primary); box-shadow: 0 4px 15px rgba(79,70,229,0.1), 0 0 0 1px var(--primary) inset; }
+
+.tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.miniBtn { padding: 10px 8px; background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); border-radius: 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+.miniBtn:hover { border-color: var(--primary); color: var(--primary); background: #fff; }
+
+/* Range Input */
+.rangeRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 11px; font-weight: 700; }
+.rangeRow span:last-child { color: var(--primary); background: rgba(79, 70, 229, 0.1); padding: 3px 8px; border-radius: 6px; }
+.range { width: 100%; height: 6px; background: #e2e8f0; border-radius: 4px; appearance: none; outline: none; cursor: pointer; }
+.range::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: 0.2s; }
+.range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+.btn-crop { width: 100%; padding: 14px; font-size: 14px; margin-top: 6px; }
+.btn-crop:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* Result Box */
+.result { margin-top: 16px; padding: 16px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px; animation: slideUp 0.4s ease; }
+.rhead { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--success); font-weight: 800; font-size: 13px; }
+.ok { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: rgba(16, 185, 129, 0.15); }
+.outGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.outStat { padding: 10px; border-radius: 10px; background: #fff; border: 1px solid rgba(16,185,129,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+.outStat small { display: block; color: var(--text-muted); font-size: 9px; font-weight: 700; margin-bottom: 4px; }
+.outStat strong { font-size: 12px; color: var(--text-dark); }
+.downloadBtn { width: 100%; background: var(--success); color: #fff; padding: 12px; border-radius: 10px; font-weight: 700; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25); transition: 0.2s; }
+.downloadBtn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(16, 185, 129, 0.35); }
+.ghostBtn { width: 100%; padding: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.7); border-radius: 10px; font-weight: 700; font-size: 12px; color: var(--text-muted); transition: 0.2s; }
+.ghostBtn:hover { background: #fff; color: var(--text-dark); }
+
+.footer { text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 30px; padding-bottom: 30px; }
+
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive Grid Adjustments */
+@media(max-width: 992px) { .workspace { grid-template-columns: 1fr; } }
+@media(max-width: 600px) {
+  .wrap { padding: 20px 16px 40px; } .panel { padding: 20px; border-radius: 20px; }
+  .upload, .canvasBox { min-height: 320px; } .hero h1 { font-size: 26px; }
+  .fileGrid, .outGrid, .tools { grid-template-columns: 1fr; } .ratios { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-shapes">
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+  <div class="shape shape-3"></div>
+</div>
+
+<header class="nav">
+  <div class="navin">
+    <a class="logo" href="/">
+      <div class="logo-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"></path></svg>
+      </div>
+      <span>JiggashaHelp</span>
+    </a>
+    <div class="badge">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+      100% Free
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Image Cropper Pro</h1>
+    <p>Select the area you need, choose an aspect ratio, rotate perfectly, and download your cropped image instantly.</p>
+  </section>
+
+  <section class="workspace">
+    <!-- Left Panel -->
+    <div class="panel">
+      <div class="head">
+        <div class="title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          Workspace
+        </div>
+        <div class="sub" id="state">Waiting for image</div>
+      </div>
+
+      <div class="upload" id="uploadZone">
+        <div>
+          <div class="upicon">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          </div>
+          <h3>Upload your image</h3>
+          <p>Drag &amp; drop or click to browse</p>
+          <button class="btn-primary" id="chooseBtn" type="button">Browse Files</button>
+          <div class="hint">JPG, PNG, WebP • Up to 25 MB</div>
+        </div>
+      </div>
+
+      <div class="canvasBox hidden" id="canvasBox">
+        <canvas id="canvasView"></canvas>
+        <div class="chiprow">
+          <span class="chip" id="fileChip">image.jpg</span>
+          <span class="chip" id="sizeChip">0 × 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="panel">
+      <div class="head">
+        <div class="title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+          Crop Settings
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">File Details</div>
+        <div class="fileGrid">
+          <div class="item"><small>Name</small><strong id="fileName">—</strong></div>
+          <div class="item"><small>File Size</small><strong id="fileSize">—</strong></div>
+          <div class="item"><small>Dimensions</small><strong id="dimensions">—</strong></div>
+          <div class="item"><small>Format</small><strong id="format">—</strong></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Aspect Ratio</div>
+        <div class="ratios">
+          <button class="ratioBtn active" data-ratio="free" type="button">Free</button>
+          <button class="ratioBtn" data-ratio="1" type="button">1 : 1</button>
+          <button class="ratioBtn" data-ratio="1.7777777778" type="button">16 : 9</button>
+          <button class="ratioBtn" data-ratio="1.3333333333" type="button">4 : 3</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardTitle">Adjustment Tools</div>
+        <div class="tools">
+          <button class="miniBtn" id="rotateLeft" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Rotate Left
+          </button>
+          <button class="miniBtn" id="rotateRight" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-9-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+            Rotate Right
+          </button>
+          <button class="miniBtn" id="resetCrop" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            Reset Crop
+          </button>
+          <button class="miniBtn" id="centerCrop" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
+            Center Crop
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:0;">
+        <div class="rangeRow"><span>Crop Zoom</span><span id="zoomValue">100%</span></div>
+        <input class="range" id="zoomRange" type="range" min="100" max="250" value="100">
+      </div>
+
+      <button class="btn-crop" id="cropBtn" type="button" disabled>
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"></path></svg>
+        Crop Image
+      </button>
+
+      <div class="result hidden" id="result">
+        <div class="rhead">
+          <div class="ok"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg></div>
+          Crop Successful
+        </div>
+        <div class="outGrid">
+          <div class="outStat"><small>Output Size</small><strong id="outDimensions">—</strong></div>
+          <div class="outStat"><small>File Size</small><strong id="outSize">—</strong></div>
+        </div>
+        <button class="downloadBtn" id="downloadBtn" type="button">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Download Image
+        </button>
+        <button class="ghostBtn" id="againBtn" type="button">Crop Another Image</button>
+      </div>
+    </div>
+  </section>
+  
+  <div class="footer">🔒 Completely secure. Processed locally on your device.</div>
+</main>
+
+<input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const input=$("fileInput"), zone=$("uploadZone"), choose=$("chooseBtn"), box=$("canvasBox"), canvas=$("canvasView"), ctx=canvas.getContext("2d");
+  const fileChip=$("fileChip"), sizeChip=$("sizeChip"), fileName=$("fileName"), fileSize=$("fileSize"), dimensions=$("dimensions"), format=$("format"), state=$("state");
+  const cropBtn=$("cropBtn"), result=$("result"), outDimensions=$("outDimensions"), outSize=$("outSize"), downloadBtn=$("downloadBtn"), againBtn=$("againBtn");
+  const zoomRange=$("zoomRange"), zoomValue=$("zoomValue");
+
+  let file=null, image=null, previewUrl=null, outUrl=null, outBlob=null;
+  let rotation=0, ratio=null, zoom=1, crop=null, dragging=false, dragMode="", startX=0,startY=0,startCrop=null;
+  let viewScale=1, displayW=0, displayH=0, offsetX=0, offsetY=0;
+  
+  const iconCrop = `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 002 2h14M18 22V8a2 2 0 00-2-2H2"></path></svg>`;
+
+  function bytes(n){
+    if(!n)return"0 B";const u=["B","KB","MB","GB"],i=Math.min(Math.floor(Math.log(n)/Math.log(1024)),3);
+    return (n/1024**i).toFixed(i?2:0)+" "+u[i];
+  }
+
+  function sourceLabel(f){ return f.type==="image/png"?"PNG":f.type==="image/webp"?"WebP":"JPG"; }
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+
+  function setCrop(c){
+    const x = Math.round(clamp(c.x, 0, displayW - c.w));
+    const y = Math.round(clamp(c.y, 0, displayH - c.h));
+    const w = Math.round(Math.min(c.w, displayW - x));
+    const h = Math.round(Math.min(c.h, displayH - y));
+    crop = { x, y, w, h };
+  }
+
+  function initialCrop(){
+    const base=Math.min(displayW,displayH)*.78;
+    let w=base,h=base;
+    if(ratio && ratio>1){w=Math.min(displayW,base*1.12);h=w/ratio;if(h>displayH){h=displayH*.78;w=h*ratio}}
+    if(ratio && ratio<1){h=Math.min(displayH,base*1.12);w=h*ratio;if(w>displayW){w=displayW*.78;h=w/ratio}}
+    if(!ratio){w=Math.min(displayW,displayH)*.78;h=w}
+    setCrop({x:(displayW-w)/2,y:(displayH-h)/2,w,h});
+  }
+
+  function draw(){
+    if(!image)return;
+    const maxW=Math.max(1,box.clientWidth-2), maxH=Math.max(1,380-2);
+    const rotated=(Math.abs(rotation)%180)!==0;
+    const iw=rotated?image.naturalHeight:image.naturalWidth;
+    const ih=rotated?image.naturalWidth:image.naturalHeight;
+    viewScale=Math.min(maxW/iw,maxH/ih,1);
+    
+    displayW=Math.floor(iw*viewScale);
+    displayH=Math.floor(ih*viewScale);
+    
+    canvas.width=displayW;
+    canvas.height=displayH;
+    canvas.style.width=displayW+"px";
+    canvas.style.height=displayH+"px";
+    
+    offsetX=(box.clientWidth-displayW)/2;
+    offsetY=(box.clientHeight-displayH)/2;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width/2,canvas.height/2);
+    ctx.rotate(rotation*Math.PI/180);
+    const dw=Math.floor(image.naturalWidth*viewScale);
+    const dh=Math.floor(image.naturalHeight*viewScale);
+    ctx.drawImage(image,-dw/2,-dh/2,dw,dh);
+    ctx.restore();
+
+    if(!crop||crop.x+crop.w>displayW+1||crop.y+crop.h>displayH+1) initialCrop();
+    renderOverlay();
+  }
+
+  function renderOverlay(){
+    if(!crop)return;
+    
+    const cx = Math.floor(crop.x);
+    const cy = Math.floor(crop.y);
+    const cw = Math.floor(crop.w);
+    const ch = Math.floor(crop.h);
+
+    ctx.save();
+    
+    /* Perfect Overlay Darkening without artifact lines */
+    ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+    ctx.fillRect(0, 0, canvas.width, cy);
+    ctx.fillRect(0, cy + ch, canvas.width, canvas.height - (cy + ch));
+    ctx.fillRect(0, cy, cx, ch);
+    ctx.fillRect(cx + cw, cy, canvas.width - (cx + cw), ch);
+
+    /* Clean Selection Border */
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx + 0.5, cy + 0.5, cw - 1, ch - 1);
+
+    /* Grid Lines */
+    ctx.strokeStyle = "rgba(255,255,255,0.3)";
+    ctx.lineWidth = 1;
+    for(let i=1; i<3; i++){
+      const gx = Math.floor(cx + (cw * i / 3));
+      const gy = Math.floor(cy + (ch * i / 3));
+      ctx.beginPath(); ctx.moveTo(gx + 0.5, cy); ctx.lineTo(gx + 0.5, cy + ch); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, gy + 0.5); ctx.lineTo(cx + cw, gy + 0.5); ctx.stroke();
+    }
+
+    /* Corner Handles */
+    const hs = 10;
+    ctx.fillStyle = "#4f46e5";
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.5;
+    [[cx, cy], [cx + cw, cy], [cx, cy + ch], [cx + cw, cy + ch]].forEach(p => {
+      ctx.fillRect(p[0] - hs/2, p[1] - hs/2, hs, hs);
+      ctx.strokeRect(p[0] - hs/2, p[1] - hs/2, hs, hs);
+    });
+    ctx.restore();
+  }
+
+  function point(e){
+    const r=canvas.getBoundingClientRect();
+    return {x:e.clientX-r.left,y:e.clientY-r.top};
+  }
+
+  function hitTest(p){
+    if(!crop)return"";
+    const hs=20;
+    const corners=[
+      ["tl",crop.x,crop.y],["tr",crop.x+crop.w,crop.y],["bl",crop.x,crop.y+crop.h],["br",crop.x+crop.w,crop.y+crop.h]
+    ];
+    for(const [name,x,y] of corners) if(Math.abs(p.x-x)<hs&&Math.abs(p.y-y)<hs)return name;
+    if(p.x>=crop.x&&p.x<=crop.x+crop.w&&p.y>=crop.y&&p.y<=crop.y+crop.h)return"move";
+    return"";
+  }
+
+  function applyAspect(newRatio, anchorX=crop?.x+crop?.w/2, anchorY=crop?.y+crop?.h/2){
+    ratio=newRatio;
+    if(!ratio){initialCrop();renderOverlay();return}
+    let w=crop?crop.w:Math.min(displayW,displayH)*.7;
+    let h=w/ratio;
+    if(h>displayH){h=displayH*.75;w=h*ratio}
+    if(w>displayW){w=displayW*.75;h=w/ratio}
+    setCrop({x:anchorX-w/2,y:anchorY-h/2,w,h});
+    renderOverlay();
+  }
+
+  function load(f){
+    if(!f)return;
+    if(!["image/jpeg","image/png","image/webp"].includes(f.type)){alert("Please choose a JPG, PNG or WebP image.");return}
+    if(f.size>25*1024*1024){alert("Please choose an image smaller than 25 MB.");return}
+    file=f;
+    if(previewUrl)URL.revokeObjectURL(previewUrl);
+    previewUrl=URL.createObjectURL(f);
+    image=new Image();
+    image.onload=()=>{
+      rotation=0;ratio=null;zoom=1;zoomRange.value=100;zoomValue.textContent="100%";result.classList.add("hidden");
+      fileName.textContent=f.name;fileSize.textContent=bytes(f.size);dimensions.textContent=`${image.naturalWidth} × ${image.naturalHeight}px`;format.textContent=sourceLabel(f);
+      fileChip.textContent=f.name;sizeChip.textContent=`${image.naturalWidth} × ${image.naturalHeight}`;
+      zone.classList.add("hidden");box.classList.remove("hidden");cropBtn.disabled=false;state.textContent="Drag the crop box";draw();
+    };
+    image.onerror=()=>{alert("This image could not be loaded.");resetAll()};
+    image.src=previewUrl;
+  }
+
+  function rotate(deg){
+    if(!image)return;rotation=(rotation+deg+360)%360;draw();
+    sizeChip.textContent=`${Math.round((rotation%180)?image.naturalHeight:image.naturalWidth)} × ${Math.round((rotation%180)?image.naturalWidth:image.naturalHeight)}`;
+  }
+
+  choose.onclick=e=>{e.stopPropagation();input.click()};
+  zone.onclick=()=>input.click();
+  input.onchange=()=>load(input.files&&input.files[0]);
+
+  ["dragenter","dragover"].forEach(t=>zone.addEventListener(t,e=>{e.preventDefault();zone.classList.add("drag")}));
+  ["dragleave","drop"].forEach(t=>zone.addEventListener(t,e=>{e.preventDefault();zone.classList.remove("drag")}));
+  zone.addEventListener("drop",e=>load(e.dataTransfer.files[0]));
+
+  canvas.addEventListener("pointermove",e=>{
+    if(dragging)return;
+    const mode=hitTest(point(e));
+    canvas.style.cursor=(mode==="move")?"move":
+      (mode==="tl"||mode==="br")?"nwse-resize":
+      (mode==="tr"||mode==="bl")?"nesw-resize":"crosshair";
+  });
+
+  canvas.addEventListener("pointerdown",e=>{
+    if(!crop)return;
+    canvas.setPointerCapture(e.pointerId);
+    const p=point(e),mode=hitTest(p);
+    if(!mode)return;
+    dragging=true;dragMode=mode;startX=p.x;startY=p.y;startCrop={...crop};
+  });
+
+  canvas.addEventListener("pointermove",e=>{
+    if(!dragging||!crop)return;
+    const p=point(e),dx=p.x-startX,dy=p.y-startY,sc=startCrop;
+    let nx=sc.x,ny=sc.y,nw=sc.w,nh=sc.h;
+    if(dragMode==="move"){
+      nx=clamp(sc.x+dx,0,displayW-sc.w);ny=clamp(sc.y+dy,0,displayH-sc.h);
+    }else{
+      const isRatio=!!ratio;
+      if(dragMode.includes("l")){nx=clamp(sc.x+dx,0,sc.x+sc.w-20);nw=sc.x+sc.w-nx}
+      if(dragMode.includes("r")){nw=clamp(sc.w+dx,20,displayW-sc.x)}
+      if(dragMode.includes("t")){ny=clamp(sc.y+dy,0,sc.y+sc.h-20);nh=sc.y+sc.h-ny}
+      if(dragMode.includes("b")){nh=clamp(sc.h+dy,20,displayH-sc.y)}
+      if(isRatio){
+        if(Math.abs(dx)>Math.abs(dy) && (dragMode.includes("l")||dragMode.includes("r"))) nh=nw/ratio;
+        else if(dragMode.includes("t")||dragMode.includes("b")) nw=nh*ratio;
+        if(dragMode.includes("l"))nx=sc.x+sc.w-nw;
+        if(dragMode.includes("t"))ny=sc.y+sc.h-nh;
+        if(nx<0){nx=0;nw=sc.x+sc.w-nx;nh=nw/ratio}
+        if(ny<0){ny=0;nh=sc.y+sc.h-ny;nw=nh*ratio}
+        if(nx+nw>displayW){nw=displayW-nx;nh=nw/ratio}
+        if(ny+nh>displayH){nh=displayH-ny;nw=nh*ratio}
+      }
+    }
+    setCrop({x:nx,y:ny,w:nw,h:nh});
+    draw();
+  });
+
+  ["pointerup","pointercancel"].forEach(t=>canvas.addEventListener(t,()=>{dragging=false;dragMode=""}));
+
+  canvas.addEventListener("wheel",e=>{
+    if(!image)return;
+    e.preventDefault();
+    const next=clamp(zoom+(e.deltaY<0?.1:-.1),1,2.5);zoom=next;zoomRange.value=Math.round(zoom*100);zoomValue.textContent=`${Math.round(zoom*100)}%`;
+  },{passive:false});
+
+  document.querySelectorAll(".ratioBtn").forEach(btn=>{
+    btn.onclick=()=>{
+      document.querySelectorAll(".ratioBtn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+      const v=btn.dataset.ratio==="free"?null:Number(btn.dataset.ratio);
+      ratio=v;if(!image)return;
+      if(ratio)applyAspect(ratio);else initialCrop();draw();
+    };
+  });
+
+  $("rotateLeft").onclick=()=>rotate(-90);
+  $("rotateRight").onclick=()=>rotate(90);
+  $("resetCrop").onclick=()=>{if(!image)return;ratio=null;document.querySelectorAll(".ratioBtn").forEach(b=>b.classList.remove("active"));document.querySelector('[data-ratio="free"]').classList.add("active");zoom=1;zoomRange.value=100;zoomValue.textContent="100%";draw()};
+  $("centerCrop").onclick=()=>{if(!image)return;initialCrop();draw()};
+
+  zoomRange.oninput=()=>{
+    zoom=Number(zoomRange.value)/100;zoomValue.textContent=`${zoomRange.value}%`;
+    if(crop){const cx=crop.x+crop.w/2,cy=crop.y+crop.h/2;let w=crop.w,h=crop.h;const base=Math.min(displayW,displayH)*.75;w=base*zoom/1.0;if(ratio)h=w/ratio;else h=base*zoom;
+      if(w>displayW){w=displayW*.95;if(ratio)h=w/ratio}if(h>displayH){h=displayH*.95;if(ratio)w=h*ratio}
+      setCrop({x:cx-w/2,y:cy-h/2,w,h});draw()}
+  };
+
+  cropBtn.onclick=()=>{
+    if(!image||!crop)return;
+
+    cropBtn.disabled=true;
+    cropBtn.innerHTML="<span style='animation: pulse 1s infinite'>⏳ Cropping...</span>";
+
+    try{
+      const work=document.createElement("canvas");
+      const w=image.naturalWidth;
+      const h=image.naturalHeight;
+
+      if(rotation%180!==0){
+        work.width=h;
+        work.height=w;
+      }else{
+        work.width=w;
+        work.height=h;
+      }
+
+      const wctx=work.getContext("2d");
+      if(!wctx) throw new Error("Canvas is not supported.");
+
+      wctx.imageSmoothingEnabled = true;
+      wctx.imageSmoothingQuality = "high";
+
+      wctx.save();
+
+      if(rotation===90){
+        wctx.translate(work.width,0);
+        wctx.rotate(Math.PI/2);
+        wctx.drawImage(image,0,0);
+      }else if(rotation===180){
+        wctx.translate(work.width,work.height);
+        wctx.rotate(Math.PI);
+        wctx.drawImage(image,0,0);
+      }else if(rotation===270){
+        wctx.translate(0,work.height);
+        wctx.rotate(-Math.PI/2);
+        wctx.drawImage(image,0,0);
+      }else{
+        wctx.drawImage(image,0,0);
+      }
+
+      wctx.restore();
+
+      const sourceScaleX=work.width/displayW;
+      const sourceScaleY=work.height/displayH;
+
+      /* Integer pixel mapping for clean crop */
+      const sx=Math.max(0,Math.floor(crop.x*sourceScaleX));
+      const sy=Math.max(0,Math.floor(crop.y*sourceScaleY));
+      const sw=Math.min(work.width-sx,Math.max(1,Math.floor(crop.w*sourceScaleX)));
+      const sh=Math.min(work.height-sy,Math.max(1,Math.floor(crop.h*sourceScaleY)));
+
+      const output=document.createElement("canvas");
+      output.width=sw;
+      output.height=sh;
+
+      const octx=output.getContext("2d");
+      if(!octx) throw new Error("Canvas is not supported.");
+
+      octx.imageSmoothingEnabled = true;
+      octx.imageSmoothingQuality = "high";
+
+      octx.drawImage(work,sx,sy,sw,sh,0,0,sw,sh);
+
+      const mime=file.type==="image/png"
+        ?"image/png"
+        :file.type==="image/webp"
+          ?"image/webp"
+          :"image/jpeg";
+
+      output.toBlob(blob=>{
+        if(!blob) throw new Error("Crop failed.");
+
+        if(outUrl) URL.revokeObjectURL(outUrl);
+        outBlob=blob;
+        outUrl=URL.createObjectURL(blob);
+
+        outDimensions.textContent=`${sw} × ${sh}px`;
+        outSize.textContent=bytes(blob.size);
+
+        result.classList.remove("hidden");
+        cropBtn.disabled=false;
+        cropBtn.innerHTML=`${iconCrop} Crop Again`;
+        result.scrollIntoView({behavior:"smooth",block:"nearest"});
+      },mime,.92);
+
+    }catch(err){
+      console.error(err);
+      alert("Could not crop this image.");
+      cropBtn.disabled=false;
+      cropBtn.innerHTML=`${iconCrop} Crop Image`;
+    }
+  };
+
+  downloadBtn.onclick=()=>{
+    if(!outUrl||!outBlob||!file)return;
+    const ext=file.type==="image/png"?"png":file.type==="image/webp"?"webp":"jpg";
+    const base=file.name.replace(/\.[^/.]+$/,"");
+    const a=document.createElement("a");a.href=outUrl;a.download=`${base}-cropped.${ext}`;document.body.appendChild(a);a.click();a.remove();
+  };
+
+  function resetAll(){
+    if(previewUrl)URL.revokeObjectURL(previewUrl);
+    if(outUrl)URL.revokeObjectURL(outUrl);
+    previewUrl=outUrl=null;outBlob=null;file=null;image=null;crop=null;rotation=0;ratio=null;zoom=1;
+    input.value="";box.classList.add("hidden");zone.classList.remove("hidden");result.classList.add("hidden");cropBtn.disabled=true;
+    cropBtn.innerHTML=`${iconCrop} Crop Image`; state.textContent="Waiting for image";
+    fileName.textContent=fileSize.textContent=dimensions.textContent=format.textContent="—";
+    zoomRange.value=100;zoomValue.textContent="100%";
+  }
+  againBtn.onclick=()=>{resetAll();window.scrollTo({top:0,behavior:"smooth"})};
+
+})();
+</script>
+</body>
+</html>
